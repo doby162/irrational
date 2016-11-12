@@ -5,6 +5,8 @@
 ;(base64:BASE64-STRING-TO-INTEGER "hello")
 ;(ql:quickload :cl-base64)
 ;(setf *a* (string-downcase (base64:integer-to-base64-string (arbitrary-root 2 5000000))))
+;(setf *a* (base32:encode-word (arbitrary-root 2 5000000)))
+;(setf *a* (arbitrary-base (arbitrary-root 2 5000000) 27))
 ;(search "quack" *a*)
 
 (defun digit-length (digit)
@@ -17,6 +19,14 @@
 (defun arbitrary-root ( &optional (n 2) (prec 100))
 "Returns the square root of any natural number to arbitrary precision and without the decimal point"
   (isqrt (* n (expt 10 (* 2 (- prec (digit-length (isqrt n))))))))
+
+(defun arbitrary-base (n b &optional (char-table
+(list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" " " "0" "1" "2" "3" "4" "5" "6" "7" "8" "9")))
+  (let ((ret ""))
+    (loop
+      (when (= n 0) (return ret))
+      (setf ret (concatenate 'string ret (nth (mod n b) char-table)))
+      (setf n (floor n b)))))
 
 (defun test ()
 "Unit test suit"
