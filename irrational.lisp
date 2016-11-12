@@ -40,4 +40,5 @@
     (= (* (sqrt 54321) 1000000) (round (/ (arbitrary-root 54321 8) 10)))
     (= (digit-length 123456789) 9);check digit length for accuracy
     (= (digit-length (arbitrary-root 2 123)) 123);check that arbitrary-root correctly usses the value of digit length
-    (= (digit-length (arbitrary-root 123 123)) 123));regardless of the size of n
+    (= (digit-length (arbitrary-root 123 123)) 123);regardless of the size of n
+    (equalp (arbitrary-base 8 2) "aaab")) 
