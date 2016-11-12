@@ -9,6 +9,15 @@
 ;(setf *a* (arbitrary-base (arbitrary-root 2 5000000) 27))
 ;(search "quack" *a*)
 
+(defvar *a*)
+(defun run (digits) (setf *a* (arbitrary-base (arbitrary-root 2 digits) 26)))
+(defvar *huge* 1)
+(defun find-huge (test-word)
+  (loop
+    (run *huge*)
+    (when (search test-word *a*) (return *huge*))
+    (setf *huge* (* *huge* 2))))
+
 (defun digit-length (digit)
 "A slightly cludgy way to tell the length of a number on the screen"
   (let ((len 0))
