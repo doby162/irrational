@@ -4,6 +4,8 @@
 ;(format t "~100$" x))
 ;(base64:BASE64-STRING-TO-INTEGER "hello")
 ;(ql:quickload :cl-base64)
+;(setf *a* (string-downcase (base64:integer-to-base64-string (arbitrary-root 2 5000000))))
+;(search "quack" *a*)
 
 (defun digit-length (digit)
 "A slightly cludgy way to tell the length of a number on the screen"
