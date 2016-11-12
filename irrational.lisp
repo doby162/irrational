@@ -13,8 +13,10 @@
 (defun run (digits) (setf *a* (arbitrary-base (arbitrary-root 2 digits) 26)))
 (defvar *huge* 1)
 (defun find-huge (test-word)
+  (setf *huge* 1)
   (loop
-    (run *huge*)
+    (format t "Searching for your word in ~a digits~%" *huge*)
+    (time (run *huge*))
     (when (search test-word *a*) (return *huge*))
     (setf *huge* (* *huge* 2))))
 
