@@ -1,66 +1,28 @@
-;(let ((n 871) (x 1))
-;(dotimes (k 90)
-;(setf x (* 0.5 (+ x (/ n x)))))
-;(format t "~100$" x))
-;(base64:BASE64-STRING-TO-INTEGER "hello")
-;(ql:quickload :cl-base64)
-;(setf *a* (string-downcase (base64:integer-to-base64-string (arbitrary-root 2 5000000))))
-;(setf *a* (base32:encode-word (arbitrary-root 2 5000000)))
-;(setf *a* (arbitrary-base (arbitrary-root 2 5000000) 27))
-;(search "quack" *a*)
-;(bordeaux-threads:make-thread (lambda() (run 100000)))
 (ql:quickload :bordeaux-threads)
 
 (defvar *corenum* 0)
 (defvar *a* "")
 
-(defun run (digits) (setf *a* (arbitrary-base (arbitrary-root 2 digits) 26)))
-
-(defvar *huge* 1)
-
-(defun find-huge (test-word)
-  (setf *huge* 1)
-  (loop
-    (format t "Searching for your word in ~a digits~%" *huge*)
-    (time (run *huge*))
-    (when (search test-word *a*) (return *huge*))
-    (setf *huge* (* *huge* 2))))
-
-
-
-
-(defun find-huge-cores (test-word &optional (cores 2))
-  (setf *huge* 2048)
-  (loop
-    (loop (when (= 0 *thread1*) (return)))
-    (format t "Searching for your word in ~a digits~% on core 1" *huge*)
-    (setf *thread1* 1)
-    (bordeaux-threads:make-thread (lambda() (format t "new thread") (time (run *huge*))(setf *thread1* 0) (format t "thread finished")))
-    (when (search test-word *a*) (return *huge*))
-    (setf *huge* (* *huge* 2))
-    (loop (when (= 0 *thread2*) (return)))
-    (format t "Searching for your word in ~a digits~% on core 2" *huge*)
-    (setf *thread2* 1)
-    (bordeaux-threads:make-thread (lambda() (time (run *huge*))(setf *thread2* 0)))
-    (when (search test-word *a*) (return *huge*))
-))
-
-
-(defun spawn-thread ()
+(defun spawn-thread (digits root)
   (setf *corenum* (+ *corenum* 1))
-  (format t "running for ~a digits ~%" *huge*)
-  (bordeaux-threads:make-thread (lambda() (time (run *huge*))   (setf *corenum* (- *corenum* 1))    )))
+  (bordeaux-threads:make-thread (lambda() (run digits root)   (setf *corenum* (- *corenum* 1))    )))
 
-(defun multi-find (test-word) 
+(defun multi-find (test-word &optional (root 2)) 
   (setf *a* "")
-  (setf *huge* 1)
+  (let ((digits 1))
   (loop
-    (when (search test-word *a*) (return *huge*))
+    (when (search test-word *a*) (return digits))
     (bordeaux-threads:thread-yield)
-    (when (< *corenum* 3)(format t "new thread") (spawn-thread) (setf *huge* (* *huge* 2))))
-    (format t "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"))
+    (when (< *corenum* 2) (spawn-thread digits root) (setf digits (* digits 2))))))
 
+(defun run (digits root) (setf *a* (arbitrary-base (arbitrary-root root digits) 26)))
 
+(defun find-huge (test-word &optional (root 2))
+  (let ((digits 1))
+  (loop
+    (run digits root)
+    (when (search test-word *a*) (return digits))
+    (setf digits (* digits 2)))))
 
 (defun digit-length (digit)
 "A slightly cludgy way to tell the length of a number on the screen"
