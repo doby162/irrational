@@ -1,7 +1,14 @@
-(ql:quickload :bordeaux-threads)
-
+(defpackage #:irrational
+  (:use :cl)
+  (:export :find-huge);
+  (:export :multi-find);
+  (:export :irrational-search);
+  (:export :test));
+(in-package :irrational);
 (defvar *corenum* 0)
 (defvar *a* "")
+
+(defun irrational-search (word) (search word *a*))
 
 (defun spawn-thread (digits root)
   (setf *corenum* (+ *corenum* 1))
