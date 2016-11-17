@@ -7,6 +7,16 @@
 (in-package :irrational);
 (defvar *corenum* 0)
 (defvar *a* "")
+;(time (setf *a* (arbitrary-base (newt-find 2 100) 26)))
+
+
+(defun newt-find (n precision)
+  (let ((x 1))
+  (setf precision (- precision (digit-length n)))
+    (dotimes (i precision)
+      (setf n (* n 100))
+      (dotimes (k 15)
+	(setf x (floor (+ x (floor n x)) 2))))(return-from newt-find x)))
 
 (defun irrational-search (word) (search word *a*))
 
@@ -45,10 +55,11 @@
 (defun arbitrary-base (n b &optional (char-table
 (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" " " "0" "1" "2" "3" "4" "5" "6" "7" "8" "9")))
   (let ((ret ""))
-    (loop
+    (reverse 
+      (loop
       (when (= n 0) (return ret))
       (setf ret (concatenate 'string ret (nth (mod n b) char-table)))
-      (setf n (floor n b)))))
+      (setf n (floor n b))))))
 
 (defun test ()
 "Unit test suit"
@@ -63,4 +74,4 @@
     (= (digit-length 123456789) 9);check digit length for accuracy
     (= (digit-length (arbitrary-root 2 123)) 123);check that arbitrary-root correctly usses the value of digit length
     (= (digit-length (arbitrary-root 123 123)) 123);regardless of the size of n
-    (equalp (arbitrary-base 8 2) "aaab")) 
+    (equalp (arbitrary-base 8 2) "baaa")) 
