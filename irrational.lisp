@@ -8,15 +8,18 @@
 (defvar *corenum* 0)
 (defvar *a* "")
 ;(time (setf *a* (arbitrary-base (newt-find 2 100) 26)))
-
-
-(defun newt-find (n precision)
-  (let ((x 1))
-  (setf precision (- precision (digit-length n)))
+;todo: add the notion of arbitrary base to all function, make the arbitrary base function accept 
+;a vector of octets, implement caching
+(defun newt-find (n precision base &optional (guess 1))
+  (let ((x guess) (past 1))
+    (setf precision (- precision (digit-length n)))
     (dotimes (i precision)
-      (setf n (* n 100))
-      (dotimes (k 15)
-	(setf x (floor (+ x (floor n x)) 2))))(return-from newt-find x)))
+      (setf n (* n (* base base)))
+      (loop
+	    (setf x (floor (+ x (floor n x)) 2)) (when (= past x) (return "x")) (setf past x)))
+    (return-from newt-find x)))
+
+(defun digit-engine (n precision base) (arbitrary-base (newt-find n precision base) base))
 
 (defun irrational-search (word) (search word *a*))
 
