@@ -9,8 +9,6 @@
 (defvar *a* "")
 
 (defvar *cache* ())
-
-;(time (setf *a* (arbitrary-base (newt-find 2 100) 26)))
 ;todo: add the notion of arbitrary base to all function, make the arbitrary base function accept 
 ;a vector of octets, implement caching
 
@@ -19,18 +17,18 @@
       (setf n (* n (expt base (* precision 2))))
 ;      (setf x (* x (expt base precision)))
       (loop
-(format t "~a~%" x)
+;(format t "~a~%" (digit-length x))
 	    (setf x (floor (+ x (floor n x)) 2)) (when (= past x) (return "x")) (setf past x))
     (return-from newt-find x)))
 
 (defun digit-engine (n precision base &optional (guess 1)) (arbitrary-base (newt-find n precision base guess) base));deprecated :o(
 
 (defun digit-manager (n precision base)
-(format t "~a~%" precision)
+(setf precision (- precision (digit-length (isqrt n))))
   (dolist (entry *cache*)
     (when (and (= (getf entry :n) n) (= (getf entry :b) base))
       (when (> precision (getf entry :p ))
-	(setf (getf entry :d) (newt-find (* n (expt base (* 2 precision))) (- precision (getf entry :p)) base (* (getf entry :d) (expt base (- precision (getf entry :p))))))
+	(setf (getf entry :d) (newt-find n precision base (* (getf entry :d) (expt base (- precision (getf entry :p))))))
 	(setf (getf entry :x) (arbitrary-base (getf entry :d) base))
 	(setf (getf entry :p) precision)
         (return-from digit-manager "done")
@@ -58,8 +56,9 @@
 (defun find-huge (test-word &optional (root 2))
   (let ((digits 1))
   (loop
-    (run digits root)
-    (when (search test-word *a*) (return digits))
+(format t "~a~%" digits)
+    (digit-manager root digits 26)
+    (when (search test-word (getf (first *cache*) :x)) (return digits))
     (setf digits (* digits 2)))))
 
 (defun digit-length (digit)
