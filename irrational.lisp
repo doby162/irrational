@@ -7,19 +7,39 @@
 (in-package :irrational);
 (defvar *corenum* 0)
 (defvar *a* "")
+
+(defvar *cache* ())
+
 ;(time (setf *a* (arbitrary-base (newt-find 2 100) 26)))
 ;todo: add the notion of arbitrary base to all function, make the arbitrary base function accept 
 ;a vector of octets, implement caching
+
 (defun newt-find (n precision base &optional (guess 1))
-  (let ((x guess) (past 1))
-    (setf precision (- precision (digit-length n)))
-    (dotimes (i precision)
-      (setf n (* n (* base base)))
+  (let ((x guess) (past guess))
+      (setf n (* n (expt base (* precision 2))))
+;      (setf x (* x (expt base precision)))
       (loop
-	    (setf x (floor (+ x (floor n x)) 2)) (when (= past x) (return "x")) (setf past x)))
+(format t "~a~%" x)
+	    (setf x (floor (+ x (floor n x)) 2)) (when (= past x) (return "x")) (setf past x))
     (return-from newt-find x)))
 
-(defun digit-engine (n precision base) (arbitrary-base (newt-find n precision base) base))
+(defun digit-engine (n precision base &optional (guess 1)) (arbitrary-base (newt-find n precision base guess) base));deprecated :o(
+
+(defun digit-manager (n precision base)
+(format t "~a~%" precision)
+(format t "~a~%" precision)
+  (dolist (entry *cache*)
+    (when (and (= (getf entry :n) n) (= (getf entry :b) base))
+      (when (>= precision (getf entry :p ))
+  (setf precision (- precision (digit-length n)))
+	(setf (getf entry :d) (newt-find (* n (expt base (* 2 precision))) (- precision (getf entry :p)) base (* (getf entry :d) (expt base (- precision (getf entry :p))))))
+	(setf (getf entry :x) (arbitrary-base (getf entry :d) base))
+	(setf (getf entry :p) precision)
+        (return-from digit-manager "done")
+	(return-from digit-manager (getf entry :x)))
+      (return-from digit-manager (subseq (getf entry :x) 0 precision))))
+  (let ((d (newt-find n precision base (expt base precision))))
+    (push (list :n n :p precision :b base :x (arbitrary-base d base) :d d) *cache*)(return-from digit-manager "done")))
 
 (defun irrational-search (word) (search word *a*))
 
