@@ -27,11 +27,9 @@
 
 (defun digit-manager (n precision base)
 (format t "~a~%" precision)
-(format t "~a~%" precision)
   (dolist (entry *cache*)
     (when (and (= (getf entry :n) n) (= (getf entry :b) base))
-      (when (>= precision (getf entry :p ))
-  (setf precision (- precision (digit-length n)))
+      (when (> precision (getf entry :p ))
 	(setf (getf entry :d) (newt-find (* n (expt base (* 2 precision))) (- precision (getf entry :p)) base (* (getf entry :d) (expt base (- precision (getf entry :p))))))
 	(setf (getf entry :x) (arbitrary-base (getf entry :d) base))
 	(setf (getf entry :p) precision)
@@ -39,7 +37,7 @@
 	(return-from digit-manager (getf entry :x)))
       (return-from digit-manager (subseq (getf entry :x) 0 precision))))
   (let ((d (newt-find n precision base (expt base precision))))
-    (push (list :n n :p precision :b base :x (arbitrary-base d base) :d d) *cache*)(return-from digit-manager "done")))
+    (push (list :n n :p precision :b base :x (arbitrary-base d base) :d d) *cache*)(return-from digit-manager "done-new")))
 
 (defun irrational-search (word) (search word *a*))
 
